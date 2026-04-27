@@ -4,55 +4,24 @@ module.exports = {
     cards: [{
         type: 'RegistrationCountCardCard',
         source: './src/cards/RegistrationCountCardCard',
-        title: 'Registration Count',
-        displayCardType: 'Registration Count Card',
-        description: 'Displays the number of active registrations for a configured term.',
+        title: 'RegistrationCountCard Card',
+        displayCardType: 'RegistrationCountCard Card',
+        description: 'This card displays the total number of registrations for a configured term.',
+        configuration: {
+            termCode: {
+                type: 'string',
+                title: 'Term code',
+                required: true
+            },
+            termLabel: {
+                type: 'string',
+                title: 'Term label (optional)',
+                required: false
+            }
+        },
         pageRoute: {
             route: '/',
             excludeClickSelectors: ['a']
-        },
-        configuration: {
-            client: [
-                {
-                    key: 'termCode',
-                    label: 'Term Code (YYYYSS)',
-                    type: 'text',
-                    required: true
-                },
-                {
-                    key: 'termLabel',
-                    label: 'Term Label (optional display override)',
-                    type: 'text',
-                    required: false
-                }
-            ]
-        },
-        queries: {
-            'registration-count': [
-                {
-                    resourceVersions: {
-                        sectionRegistrations16: { min: 16 }
-                    },
-                    query: `query RegistrationsByTerm($termCode: String!) {
-                        sectionRegistrations16(
-                            filter: {
-                                status: {
-                                    registered: {
-                                        registrationStatus: { EQ: registered }
-                                    }
-                                }
-                                section16: {
-                                    reportingAcademicPeriod16: {
-                                        code: { EQ: $termCode }
-                                    }
-                                }
-                            }
-                        ) {
-                            totalCount
-                        }
-                    }`
-                }
-            ]
         }
     }],
     page: {

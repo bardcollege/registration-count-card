@@ -3,6 +3,7 @@ import importPlugin from 'eslint-plugin-import';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import globals from 'globals';
 
 // generate a disable map for rules tied to legacy (now ignored) function component
 // propTypes/defaultProps features; we don't blanket disable every react rule—only those that hinge
@@ -31,6 +32,7 @@ export default [
         ecmaFeatures: { jsx: true }
       },
       globals: {
+        ...globals.browser,
         window: 'readonly',
         document: 'readonly',
         navigator: 'readonly',
