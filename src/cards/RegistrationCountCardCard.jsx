@@ -25,7 +25,7 @@ const useStyles = makeStyles()({
 
 const RegistrationCountCardCard = () => {
     const { classes } = useStyles();
-    const { getEthosQuery } = useData();
+    const { authenticatedEthosFetch } = useData();
     const { configuration: { termCode = '', termLabel = '' } = {} } = useCardInfo();
     const { setLoadingStatus, setErrorMessage } = useExtensionControl();
 
@@ -42,12 +42,11 @@ const RegistrationCountCardCard = () => {
 
         const fetchCount = async () => {
             try {
-                const result = await getEthosQuery({
-                    queryId: 'registration-count',
-                    properties: { termCode },
-                });
+                const json = await authenticatedEthosFetch(
+                    `get-registration-total-by-term?termCode=${encodeURIComponent(termCode)}`
+                );
                 if (!isMounted) return;
-                const rawCount = result?.data?.sectionRegistrations16?.totalCount;
+                const rawCount = json?.data?.sectionRegistrations16?.totalCount;
                 const total = rawCount != null ? Number(rawCount) : null;
                 setCount(total);
                 setLastUpdated(new Date());
@@ -78,7 +77,7 @@ const RegistrationCountCardCard = () => {
             isMounted = false;
             clearInterval(intervalId);
         };
-    }, [getEthosQuery, termCode, setLoadingStatus, setErrorMessage]);
+    }, [authenticatedEthosFetch, termCode, setLoadingStatus, setErrorMessage]);
 
     return (
         <div className={classes.card}>

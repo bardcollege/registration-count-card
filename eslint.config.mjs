@@ -35,7 +35,11 @@ export default [
         document: 'readonly',
         navigator: 'readonly',
         process: 'readonly',
-        console: 'readonly'
+        console: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly'
       }
     },
     settings: {

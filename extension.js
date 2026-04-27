@@ -27,33 +27,6 @@ module.exports = {
                 }
             ]
         },
-        queries: {
-            'registration-count': [
-                {
-                    resourceVersions: {
-                        sectionRegistrations16: { min: 16 }
-                    },
-                    query: `query RegistrationsByTerm($termCode: String!) {
-                        sectionRegistrations16(
-                            filter: {
-                                status: {
-                                    registered: {
-                                        registrationStatus: { EQ: registered }
-                                    }
-                                }
-                                section16: {
-                                    reportingAcademicPeriod16: {
-                                        code: { EQ: $termCode }
-                                    }
-                                }
-                            }
-                        ) {
-                            totalCount
-                        }
-                    }`
-                }
-            ]
-        }
     }],
     page: {
         source: './src/page/router.jsx'
