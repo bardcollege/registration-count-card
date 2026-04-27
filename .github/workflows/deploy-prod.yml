@@ -1,0 +1,31 @@
+env: 
+  EXPERIENCE_EXTENSION_UPLOAD_TOKEN: ${{ vars.EXPERIENCE_EXTENSION_UPLOAD_TOKEN }}
+
+name: Deploy Prod
+run-name: ${{ github.actor }} is deploying to Experience Prod 🚀
+on: 
+  push:
+    branches:
+      - main
+jobs:
+  Deploy-Prod:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: 🕵️ Checking for environmental variables
+        run: echo "Environmental Variables = ${{ vars.EXPERIENCE_EXTENSION_UPLOAD_TOKEN }}"
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: 🔧 Install Dependencies
+        run: npm install
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - name: Deploy to Banner Experience Prod Environment
+        run: npm run deploy-prod
+      - run: echo "🍏 This job's status is ${{ job.status }}."
