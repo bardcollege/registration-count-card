@@ -15,7 +15,7 @@ const SEMESTER_MAP = {
  */
 export function formatTermCode(termCode) {
     const code = String(termCode ?? '').trim();
-    if (code.length < 6) return code || 'Unknown term';
+    if (code.length < 6) return 'Unknown term';
 
     let year = code.slice(0, 4);
     const suffix = code.slice(4, 6);

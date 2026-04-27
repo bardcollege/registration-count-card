@@ -47,7 +47,8 @@ const RegistrationCountCardCard = () => {
                     properties: { termCode },
                 });
                 if (!isMounted) return;
-                const total = result?.data?.sectionRegistrations16?.totalCount ?? null;
+                const rawCount = result?.data?.sectionRegistrations16?.totalCount;
+                const total = rawCount != null ? Number(rawCount) : null;
                 setCount(total);
                 setLastUpdated(new Date());
                 if (isFirstFetch) {
@@ -84,6 +85,11 @@ const RegistrationCountCardCard = () => {
             <Typography variant="h3">
                 {termDisplay} Registrations
             </Typography>
+            {!termCode && (
+                <Typography variant="body2">
+                    Configure a Term Code to display registration counts.
+                </Typography>
+            )}
             {count !== null && (
                 <>
                     <Typography className={classes.count}>
