@@ -1,30 +1,110 @@
-import { spacing40 } from '@ellucian/react-design-system/core/styles/tokens';
-import { makeStyles, Typography, TextLink } from '@ellucian/react-design-system/core';
+import { useEffect, useState } from 'react';
+import { makeStyles, Typography } from '@ellucian/react-design-system/core';
+import { colorFillAlertError, spacing40 } from '@ellucian/react-design-system/core/styles/tokens';
+import { useCardInfo, useData, useExtensionControl } from '@ellucian/experience-extension-utils';
+import { formatTermCode } from '../utils/formatTermCode';
+
+const POLL_INTERVAL_MS = 5000;
 
 const useStyles = makeStyles()({
     card: {
         margin: `0 ${spacing40}`,
-    }
+        display: 'flex',
+        flexDirection: 'column',
+        gap: spacing40,
+    },
+    count: {
+        fontSize: '3rem',
+        fontWeight: 700,
+        lineHeight: 1,
+    },
+    updated: {
+        opacity: 0.6,
+    },
 });
 
 const RegistrationCountCardCard = () => {
     const { classes } = useStyles();
+    const { getEthosQuery } = useData();
+    const { configuration: { termCode = '', termLabel = '' } = {} } = useCardInfo();
+    const { setLoadingStatus, setErrorMessage } = useExtensionControl();
+
+    const [count, setCount] = useState(null);
+    const [lastUpdated, setLastUpdated] = useState(null);
+
+    const termDisplay = termLabel || formatTermCode(termCode);
+
+    useEffect(() => {
+        if (!termCode) return;
+
+        let isMounted = true;
+        let isFirstFetch = true;
+
+        const fetchCount = async () => {
+            try {
+                const result = await getEthosQuery({
+                    queryId: 'registration-count',
+                    properties: { termCode },
+                });
+                if (!isMounted) return;
+                const rawCount = result?.data?.sectionRegistrations16?.totalCount;
+                const total = rawCount != null ? Number(rawCount) : null;
+                setCount(total);
+                setLastUpdated(new Date());
+                if (isFirstFetch) {
+                    isFirstFetch = false;
+                    setLoadingStatus(false);
+                }
+            } catch (error) {
+                if (!isMounted) return;
+                if (isFirstFetch) {
+                    isFirstFetch = false;
+                    setLoadingStatus(false);
+                    setErrorMessage({
+                        headerMessage: 'Unable to load registration data',
+                        textMessage: 'Please check the term code configuration or contact your administrator.',
+                        iconName: 'warning',
+                        iconColor: colorFillAlertError,
+                    });
+                }
+            }
+        };
+
+        setLoadingStatus(true);
+        fetchCount();
+        const intervalId = setInterval(fetchCount, POLL_INTERVAL_MS);
+
+        return () => {
+            isMounted = false;
+            clearInterval(intervalId);
+        };
+    }, [getEthosQuery, termCode, setLoadingStatus, setErrorMessage]);
 
     return (
         <div className={classes.card}>
-            <Typography variant="h2">
-                Hello RegistrationCountCard World
+            <Typography variant="h3">
+                {termDisplay} Registrations
             </Typography>
-            <Typography>
-                <span>
-                    For sample extensions, visit the Ellucian Developer
-                </span>
-                <TextLink href="https://github.com/ellucian-developer/experience-extension-sdk-samples" target="_blank">
-                     GitHub
-                </TextLink>
-            </Typography>
+            {!termCode && (
+                <Typography variant="body2">
+                    Configure a Term Code to display registration counts.
+                </Typography>
+            )}
+            {count !== null && (
+                <>
+                    <Typography className={classes.count}>
+                        {count.toLocaleString()}
+                    </Typography>
+                    {lastUpdated && (
+                        <Typography variant="body3" className={classes.updated}>
+                            Last updated: {lastUpdated.toLocaleTimeString()}
+                        </Typography>
+                    )}
+                </>
+            )}
         </div>
     );
 };
 
 export default RegistrationCountCardCard;
+
